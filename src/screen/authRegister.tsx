@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import { useNavigate } from 'react-router';
 import toast, { Toaster } from 'react-hot-toast';
 import InputField from '../components/input';
-import Button from '../components/button';
+import { Button } from '../components/button';
 
 // Simulation of API response time
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -84,7 +84,7 @@ export default function AuthRegister() {
         {...formik.getFieldProps('password')}
       />
 
-      <Button type='submit' className='self-end'>
+      <Button type='submit' className='self-end mt-2.5'>
         Continuar
       </Button>
 
