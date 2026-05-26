@@ -84,7 +84,9 @@ export default function AuthRegister() {
         {...formik.getFieldProps('password')}
       />
 
-      <Button type='submit'>Continuar</Button>
+      <Button type='submit' className='self-end'>
+        Continuar
+      </Button>
 
       <Toaster />
     </form>

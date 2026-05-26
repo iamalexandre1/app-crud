@@ -73,7 +73,7 @@ export default function AuthLogin() {
         {...formik.getFieldProps('password')}
       />
 
-      <Button type='submit' isDisabled={formik.isSubmitting}>
+      <Button type='submit' className='self-end' disabled={formik.isSubmitting}>
         Continuar
       </Button>
 
