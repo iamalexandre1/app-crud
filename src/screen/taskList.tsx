@@ -1,134 +1,41 @@
 import { useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
-import toast, { Toaster } from 'react-hot-toast';
-import type { taskFormI, taskI } from '../types/task';
-import Drawer from '../layout/drawer';
+import { Toaster } from 'react-hot-toast';
+import type { taskI } from '../types/task';
+import { useTaskList } from '../context/taskListContext';
 import { Button } from '../components/button';
 import TaskListItem from '../components/taskListItem';
+import Drawer from '../layout/drawer';
 
 export default function TaskList() {
-  const [taskList, setTaskList] = useState<taskI[]>([
-    {
-      id: '01',
-      taskTitle: 'Item - 01',
-      taskDescription: '',
-      taskIsCompleted: false,
-    },
-    {
-      id: '02',
-      taskTitle: 'Item - 02',
-      taskDescription: 'sla',
-      taskIsCompleted: false,
-    },
-  ]);
-  const [drawerIsActive, setDrawerIsActive] = useState(false);
-  const [taskSelected, setTaskSelected] = useState<taskI>({
-    id: '',
-    taskTitle: '',
-    taskDescription: '',
-    taskIsCompleted: false,
-  });
+  const [drawer, setDrawer] = useState(false);
+  // Evita o bug: abrir drawer → digitar → fechar → abrir e manter valores antigos.
+  // Incrementamos esse contador ao abrir para remontar o form e re-aplicar valores iniciais.
+  const [enableReinitialize, setEnableReinitialize] = useState(0);
+  const { taskList, handleDefineTaskSelected, handleResetTaskSelected } = useTaskList();
 
   // Actions
-  const handleTaskListAdd = (dataTask: taskFormI) => {
-    const createID = `${(Math.random() * 100).toFixed(2)}-${dataTask.taskTitle.trim().replaceAll(' ', '')}`;
-
-    const newTask: taskI = {
-      id: createID,
-      taskTitle: dataTask.taskTitle,
-      taskDescription: dataTask.taskDescription,
-      taskIsCompleted: dataTask.taskIsCompleted,
-    };
-
-    setTaskList((task) => [newTask, ...task]);
+  const handleDrawerOpen = () => {
+    setDrawer(true);
+    setEnableReinitialize((prev) => prev + 1);
   };
-  const handleTaskListEdit = (dataTask: taskFormI) => {
-    const updatedTaskList = taskList.map((task) => {
-      if (task.id === taskSelected.id) {
-        return {
-          ...task,
-          taskTitle: dataTask.taskTitle,
-          taskDescription: dataTask.taskDescription,
-          taskIsCompleted: dataTask.taskIsCompleted,
-        };
-      }
-
-      return task;
-    });
-
-    setTaskList(updatedTaskList);
+  const handleDrawerClose = () => {
+    setDrawer(false);
+    handleResetTaskSelected();
   };
-  const handleTaskDelete = (taskId: string) => {
-    const removeTask = taskList.filter((task) => task.id !== taskId);
-
-    setTaskList(removeTask);
-    handleDrawerHidde();
-  };
-  const toggleTaskIsCompleted = (taskId: string) => {
-    const updatedTaskList = taskList.map((task) => {
-      if (task.id === taskId) {
-        return {
-          ...task,
-          taskIsCompleted: !task.taskIsCompleted,
-        };
-      }
-
-      return task;
-    });
-
-    setTaskList(updatedTaskList);
-  };
-  const handleDrawerSubmit = (dataTask: taskFormI) => {
-    if (dataTask.taskTitle === '') {
-      toast.error('Título da tarefa é obrigatório', {
-        className:
-          'dark:bg-neutral-800 dark:text-neutral-50 dark:shadow dark:shadow-gray-800',
-      });
-      return;
-    }
-
-    if (taskSelected.id !== '') {
-      handleTaskListEdit(dataTask);
-    }
-
-    if (taskSelected.id === '') {
-      handleTaskListAdd(dataTask);
-    }
-
-    handleDrawerHidde();
-  };
-  const handleDrawerOpen = (task?: taskI) => {
-    if (task) {
-      setTaskSelected(task);
-    }
-
-    setDrawerIsActive(true);
-  };
-  const handleDrawerHidde = () => {
-    setTaskSelected({
-      id: '',
-      taskTitle: '',
-      taskDescription: '',
-      taskIsCompleted: false,
-    });
-    setDrawerIsActive(false);
+  const onDrawerTaskEdit = (dataTask: taskI) => {
+    handleDefineTaskSelected(dataTask);
+    handleDrawerOpen();
   };
 
   return (
     <>
-      <Drawer
-        key={taskSelected.id}
-        taskSelected={taskSelected}
-        open={drawerIsActive}
-        onClose={handleDrawerHidde}
-        onTaskDelete={handleTaskDelete}
-        onDrawerSubmit={handleDrawerSubmit}
-      />
+      <Drawer key={enableReinitialize} open={drawer} onClose={handleDrawerClose} />
 
       <div className='flex justify-between items-center'>
         <h2 className='text-2xl font-semibold mt-1.5'>Lista de Tarefas</h2>
 
-        <Button onClick={() => handleDrawerOpen()}>
+        <Button onClick={handleDrawerOpen}>
           <FaPlus />
           Adicionar
         </Button>
@@ -136,16 +43,11 @@ export default function TaskList() {
 
       <ul className='py-3'>
         {taskList.map((task) => (
-          <TaskListItem
-            key={task.id}
-            data={task}
-            onDrawerTaskEdit={handleDrawerOpen}
-            onToggleTaskIsCompleted={toggleTaskIsCompleted}
-          />
+          <TaskListItem key={task.id} data={task} onDrawerTaskEdit={onDrawerTaskEdit} />
         ))}
       </ul>
 
-      <Toaster position='top-center' />
+      <Toaster position='bottom-center' />
     </>
   );
 }

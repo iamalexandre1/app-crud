@@ -1,9 +1,10 @@
 import { createBrowserRouter } from 'react-router';
 import Layout from '../layout';
+import TaskListProvider from '../context/taskListProvider';
+import TaskList from '../screen/taskList';
 import AuthLayout from '../layout/authLayout';
 import AuthLogin from '../screen/authLogin';
 import AuthRegister from '../screen/authRegister';
-import TaskList from '../screen/taskList';
 
 export default createBrowserRouter([
   {
@@ -12,7 +13,11 @@ export default createBrowserRouter([
     children: [
       {
         path: '',
-        element: <TaskList />,
+        element: (
+          <TaskListProvider>
+            <TaskList />
+          </TaskListProvider>
+        ),
       },
     ],
   },

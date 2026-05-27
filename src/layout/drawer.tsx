@@ -1,46 +1,17 @@
-import { useState, useRef, useEffect, type SubmitEvent } from 'react';
-import { FaX, FaTrash } from 'react-icons/fa6';
-import type { taskFormI, taskI } from '../types/task';
-import InputField from '../components/input';
-import { Button, ButtonIcon } from '../components/button';
-import TaskItemCheckbox from '../components/taskItemCheckbox';
+import { useRef, useEffect } from 'react';
+import { FaX } from 'react-icons/fa6';
+import { useTaskList } from '../context/taskListContext';
+import DrawerForm from '../components/drawerForm';
+import { ButtonIcon } from '../components/button';
 
 type DrawerProps = {
-  taskSelected: taskI;
   open: boolean;
   onClose: () => void;
-  onTaskDelete: (taskId: string) => void;
-  onDrawerSubmit: (dataTask: taskFormI) => void;
 };
 
-export default function Drawer({
-  taskSelected,
-  open = false,
-  onClose,
-  onTaskDelete,
-  onDrawerSubmit,
-}: DrawerProps) {
-  const [taskTitle, setTaskTitle] = useState(taskSelected.taskTitle);
-  const [taskDescription, setTaskDescription] = useState(
-    taskSelected.taskDescription,
-  );
-  const [taskIsCompleted, setTaskIsCompleted] = useState(
-    taskSelected.taskIsCompleted,
-  );
+export default function Drawer({ open = false, onClose }: DrawerProps) {
+  const { taskSelected } = useTaskList();
   const drawerRef = useRef<HTMLDivElement>(null);
-
-  // Action
-  const onSubmit = (e: SubmitEvent) => {
-    e.preventDefault();
-
-    const newTask: taskFormI = {
-      taskTitle,
-      taskDescription,
-      taskIsCompleted,
-    };
-
-    onDrawerSubmit(newTask);
-  };
 
   // Close Drawer when click outside
   useEffect(() => {
@@ -86,39 +57,7 @@ export default function Drawer({
         </div>
 
         <div className='pt-4 p-3'>
-          <div className='border-b border-b-gray-300 dark:border-b-gray-700 flex justify-between items-center pb-1.5'>
-            <TaskItemCheckbox
-              checked={taskIsCompleted}
-              onToggle={() => setTaskIsCompleted((oldState) => !oldState)}
-            />
-
-            <ButtonIcon
-              className='text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-500'
-              disabled={taskSelected.id === ''}
-              onClick={() => onTaskDelete(taskSelected.id)}
-            >
-              <FaTrash className='text-lg' />
-            </ButtonIcon>
-          </div>
-
-          <form className='pt-4' onSubmit={onSubmit}>
-            <InputField
-              label='Título'
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
-            />
-
-            <InputField
-              label='Descrição'
-              className='my-2'
-              value={taskDescription}
-              onChange={(e) => setTaskDescription(e.target.value)}
-            />
-
-            <Button type='submit' className='text-base mt-3.5 ml-auto'>
-              {taskSelected.id === '' ? 'Adicionar' : 'Atualizar'}
-            </Button>
-          </form>
+          <DrawerForm onDrawerClose={onClose} />
         </div>
       </div>
     </div>

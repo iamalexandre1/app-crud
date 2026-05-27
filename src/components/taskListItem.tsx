@@ -1,24 +1,22 @@
 import { FaChevronRight, FaT } from 'react-icons/fa6';
+import { useTaskList } from '../context/taskListContext';
 import type { taskI } from '../types/task';
 import { ButtonIcon } from './button';
 import TaskItemCheckbox from './taskItemCheckbox';
 
 type TaskListItemProps = {
   data: taskI;
-  onDrawerTaskEdit: (data: taskI) => void;
-  onToggleTaskIsCompleted: (taskId: string) => void;
+  onDrawerTaskEdit?: (data: taskI) => void;
 };
 
-export default function TaskListItem({
-  data,
-  onDrawerTaskEdit,
-  onToggleTaskIsCompleted,
-}: TaskListItemProps) {
+export default function TaskListItem({ data, onDrawerTaskEdit }: TaskListItemProps) {
+  const { handleTaskEdit } = useTaskList();
+
   // Actions
   const onTaskToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    onToggleTaskIsCompleted(data.id);
+    handleTaskEdit({ ...data, taskIsCompleted: !data.taskIsCompleted });
   };
 
   return (
@@ -27,12 +25,9 @@ export default function TaskListItem({
         bg-transparent hover:bg-neutral-200 rounded-lg flex gap-1.5 pb-0 p-2 transition-colors
         dark:hover:bg-neutral-800
       `}
-      onClick={() => onDrawerTaskEdit(data)}
+      onClick={() => onDrawerTaskEdit && onDrawerTaskEdit(data)}
     >
-      <TaskItemCheckbox
-        checked={data.taskIsCompleted}
-        onToggle={onTaskToggle}
-      />
+      <TaskItemCheckbox checked={data.taskIsCompleted} onToggle={onTaskToggle} />
 
       <div className='border-b border-b-gray-300 dark:border-b-gray-700 flex-1 pb-2.5 min-w-0'>
         <div className='flex items-center gap-2 overflow-hidden'>
