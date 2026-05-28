@@ -10,13 +10,13 @@ type TaskListItemProps = {
 };
 
 export default function TaskListItem({ data, onDrawerTaskEdit }: TaskListItemProps) {
-  const { handleTaskEdit } = useTaskList();
+  const { onTaskEdit } = useTaskList();
 
   // Actions
   const onTaskToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    handleTaskEdit({ ...data, taskIsCompleted: !data.taskIsCompleted });
+    onTaskEdit({ ...data, taskIsCompleted: !data.taskIsCompleted });
   };
 
   return (

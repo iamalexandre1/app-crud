@@ -4,11 +4,11 @@ import type { taskI } from '../types/task';
 export type TaskListContextProps = {
   taskList: taskI[];
   taskSelected: taskI;
-  handleTaskAdd: (dataTask: taskI) => void;
-  handleTaskEdit: (dataTask: taskI) => void;
-  handleTaskDelete: (taskId: string) => void;
-  handleDefineTaskSelected: (dataTask: taskI) => void;
-  handleResetTaskSelected: () => void;
+  onTaskAdd: (dataTask: taskI, callback?: () => void) => void;
+  onTaskEdit: (dataTask: taskI, callback?: () => void) => void;
+  onTaskDelete: (taskId: string, callback?: () => void) => void;
+  onDefineTaskSelected: (dataTask: taskI) => void;
+  onResetTaskSelected: () => void;
 };
 
 export const TaskListContext = createContext<TaskListContextProps>({
@@ -19,11 +19,11 @@ export const TaskListContext = createContext<TaskListContextProps>({
     taskDescription: '',
     taskIsCompleted: false,
   },
-  handleTaskAdd: () => {},
-  handleTaskEdit: () => {},
-  handleTaskDelete: () => {},
-  handleDefineTaskSelected: () => {},
-  handleResetTaskSelected: () => {},
+  onTaskAdd: () => {},
+  onTaskEdit: () => {},
+  onTaskDelete: () => {},
+  onDefineTaskSelected: () => {},
+  onResetTaskSelected: () => {},
 });
 
 export const useTaskList = () => useContext(TaskListContext);

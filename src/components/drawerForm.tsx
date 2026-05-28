@@ -9,20 +9,17 @@ import toast from 'react-hot-toast';
 
 type DrawerFormProps = {
   drawerIsOpen?: boolean;
-  onDrawerClose?: () => void;
+  onDrawerClose: () => void;
 };
 
 export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
-  const { taskSelected, handleTaskDelete, handleTaskAdd, handleTaskEdit } = useTaskList();
+  const { taskSelected, onTaskDelete, onTaskAdd, onTaskEdit } = useTaskList();
   const [taskTitle, setTaskTitle] = useState(taskSelected.taskTitle);
   const [taskDescription, setTaskDescription] = useState(taskSelected.taskDescription);
   const [taskIsCompleted, setTaskIsCompleted] = useState(taskSelected.taskIsCompleted);
 
   // Actions
-  const onTaskDelete = () => {
-    handleTaskDelete(taskSelected.id);
-    onDrawerClose();
-  };
+  const handleTaskDelete = () => onTaskDelete(taskSelected.id, onDrawerClose);
   const onSubmit = (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -38,17 +35,12 @@ export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
       taskIsCompleted,
     };
 
-    if (taskSelected.id === '') {
-      handleTaskAdd(createTask);
-      toast.success('Tarefa adicionada com sucesso');
-    }
-
     if (taskSelected.id !== '') {
-      handleTaskEdit(createTask);
-      toast.success('Tarefa atualizada com sucesso');
+      onTaskEdit(createTask, onDrawerClose);
+      return;
     }
 
-    onDrawerClose();
+    onTaskAdd(createTask, onDrawerClose);
   };
 
   return (
@@ -62,7 +54,7 @@ export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
         <ButtonIcon
           className='text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-500'
           disabled={taskSelected.id === ''}
-          onClick={onTaskDelete}
+          onClick={handleTaskDelete}
         >
           <FaTrash className='text-lg' />
         </ButtonIcon>

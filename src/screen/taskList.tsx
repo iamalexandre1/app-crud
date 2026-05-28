@@ -12,7 +12,7 @@ export default function TaskList() {
   // Evita o bug: abrir drawer → digitar → fechar → abrir e manter valores antigos.
   // Incrementamos esse contador ao abrir para remontar o form e re-aplicar valores iniciais.
   const [enableReinitialize, setEnableReinitialize] = useState(0);
-  const { taskList, handleDefineTaskSelected, handleResetTaskSelected } = useTaskList();
+  const { taskList, onDefineTaskSelected, onResetTaskSelected } = useTaskList();
 
   // Actions
   const handleDrawerOpen = () => {
@@ -21,10 +21,10 @@ export default function TaskList() {
   };
   const handleDrawerClose = () => {
     setDrawer(false);
-    handleResetTaskSelected();
+    onResetTaskSelected();
   };
   const onDrawerTaskEdit = (dataTask: taskI) => {
-    handleDefineTaskSelected(dataTask);
+    onDefineTaskSelected(dataTask);
     handleDrawerOpen();
   };
 

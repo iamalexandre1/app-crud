@@ -1,5 +1,7 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import toast from 'react-hot-toast';
 import type { taskI } from '../types/task';
+import { privateAPI } from '../service/api';
 import { TaskListContext, type TaskListContextProps } from './taskListContext';
 
 type TaskListProviderProps = {
@@ -7,20 +9,7 @@ type TaskListProviderProps = {
 };
 
 export default function TaskListProvider({ children }: TaskListProviderProps) {
-  const [taskList, setTaskList] = useState<taskI[]>([
-    {
-      id: '01',
-      taskTitle: 'Item - 01',
-      taskDescription: '',
-      taskIsCompleted: false,
-    },
-    {
-      id: '02',
-      taskTitle: 'Item - 02',
-      taskDescription: 'sla',
-      taskIsCompleted: false,
-    },
-  ]);
+  const [taskList, setTaskList] = useState<taskI[]>([]);
   const [taskSelected, setTaskSelected] = useState<taskI>({
     id: '',
     taskTitle: '',
@@ -29,38 +18,50 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
   });
 
   // Actions
-  const handleTaskAdd = (dataTask: taskI) => {
-    const createTask: taskI = {
-      ...dataTask,
-      id: `${(Math.random() * 100).toFixed(4)}-${dataTask.taskTitle.trim().replaceAll(' ', '')}`,
-    };
-
-    setTaskList((task) => [createTask, ...task]);
+  const onTaskAdd = (dataTask: taskI, callback?: () => void) => {
+    privateAPI
+      .addTask(dataTask)
+      .then((resp) => {
+        setTaskList((task) => [resp.payload, ...task]);
+        toast.success(resp.msg);
+        callback?.();
+      })
+      .catch((err) => toast.error(err.message));
   };
-  const handleTaskEdit = (dataTask: taskI) => {
-    const updatedTaskList = taskList.map((task) => {
-      if (task.id === dataTask.id)
-        return {
-          ...task,
-          taskTitle: dataTask.taskTitle,
-          taskDescription: dataTask.taskDescription,
-          taskIsCompleted: dataTask.taskIsCompleted,
-        };
+  const onTaskEdit = (dataTask: taskI, callback?: () => void) => {
+    privateAPI
+      .editTask(dataTask)
+      .then((resp) => {
+        const updatedTask = taskList.map((task) => {
+          if (task.id === dataTask.id) {
+            return resp.payload;
+          }
+          return task;
+        });
 
-      return task;
-    });
+        setTaskList(updatedTask);
 
-    setTaskList(updatedTaskList);
+        if (callback) toast.success(resp.msg);
+
+        callback?.();
+      })
+      .catch((err) => toast.error(err.message));
   };
-  const handleTaskDelete = (taskId: string) => {
-    const removeTask = taskList.filter((task) => task.id !== taskId);
-
-    setTaskList(removeTask);
+  const onTaskDelete = (taskId: string, callback?: () => void) => {
+    privateAPI
+      .deleteTask(taskId)
+      .then((resp) => {
+        const updatedTask = taskList.filter((task) => task.id !== taskId);
+        setTaskList(updatedTask);
+        toast.success(resp.msg);
+        callback?.();
+      })
+      .catch((err) => toast.error(err.message));
   };
-  const handleDefineTaskSelected = (dataTask: taskI) => {
+  const onDefineTaskSelected = (dataTask: taskI) => {
     setTaskSelected(dataTask);
   };
-  const handleResetTaskSelected = () =>
+  const onResetTaskSelected = () =>
     setTaskSelected({
       id: '',
       taskTitle: '',
@@ -68,14 +69,28 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
       taskIsCompleted: false,
     });
 
+  useEffect(() => {
+    const fetchTaskList = async () => {
+      try {
+        const respFecthTaskList = await privateAPI.getTaskList();
+
+        setTaskList(respFecthTaskList);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchTaskList();
+  }, []);
+
   const conextValues: TaskListContextProps = {
     taskList,
     taskSelected,
-    handleTaskAdd,
-    handleTaskEdit,
-    handleTaskDelete,
-    handleDefineTaskSelected,
-    handleResetTaskSelected,
+    onTaskAdd,
+    onTaskEdit,
+    onTaskDelete,
+    onDefineTaskSelected,
+    onResetTaskSelected,
   };
 
   return (
