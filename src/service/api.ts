@@ -24,7 +24,14 @@ interface respAddTaskI {
 // API
 export const privateAPI = {
   getTaskList: (): Promise<taskI[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(taskList), 800));
+    return new Promise((resolve) =>
+      /*
+       * Retorna um Deep Copy (cópia profunda) para isolar a memória do mock da memória do React.
+       * Sem isso, mutações locais (como .push no addTask) alteram o estado do React por tabela,
+       * gerando duplicidade quando o Contexto executa o 'setTaskList'.
+       */
+      setTimeout(() => resolve(JSON.parse(JSON.stringify(taskList))), 800),
+    );
   },
   addTask: async (dataTask: Omit<taskI, 'id'>): Promise<respAddTaskI> => {
     if (dataTask.taskTitle === '') throw new Error('Título é um campo obrigatório');
@@ -39,7 +46,7 @@ export const privateAPI = {
       id: createId,
     };
 
-    taskList.push(createTask);
+    taskList.push({ ...createTask });
 
     const resp: respAddTaskI = {
       msg: 'Tarefa adicionada com sucesso!',
