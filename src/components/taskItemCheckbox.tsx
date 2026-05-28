@@ -5,10 +5,7 @@ type TaskItemCheckboxProps = {
   onToggle: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-export default function TaskItemCheckbox({
-  checked,
-  onToggle,
-}: TaskItemCheckboxProps) {
+export default function TaskItemCheckbox({ checked, onToggle }: TaskItemCheckboxProps) {
   return (
     <div
       onClick={onToggle}

@@ -52,9 +52,7 @@ export default function AuthRegister() {
   });
 
   // Actions
-  const handlerGetFieldErros = (
-    fieldName: keyof typeof formik.initialValues,
-  ) => {
+  const handlerGetFieldErros = (fieldName: keyof typeof formik.initialValues) => {
     return formik.touched[fieldName] && formik.errors[fieldName]
       ? formik.errors[fieldName]
       : undefined;

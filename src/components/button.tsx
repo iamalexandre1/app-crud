@@ -4,9 +4,10 @@ import { twMerge } from 'tailwind-merge';
 type ButtonProps = ComponentPropsWithRef<'button'> & {
   children: React.ReactNode;
   className?: string;
+  isLoading?: boolean;
 };
 
-export function Button({ className, children, ...rest }: ButtonProps) {
+export function Button({ className, isLoading, children, ...rest }: ButtonProps) {
   // Style
   const styleButton = (className?: string): string => {
     const baseClassName = `
@@ -22,7 +23,11 @@ export function Button({ className, children, ...rest }: ButtonProps) {
 
   return (
     <button className={styleButton(className)} {...rest}>
-      {children}
+      {!isLoading && children}
+
+      {isLoading && (
+        <div className='border-2 border-t-transparent border-blue-900 rounded-full w-5 h-5 animate-spin'></div>
+      )}
     </button>
   );
 }

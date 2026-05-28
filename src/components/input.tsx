@@ -22,9 +22,7 @@ export default function InputField({
       />
 
       {erroMessage && (
-        <span className='text-red-600 text-sm mt-1 dark:text-red-500'>
-          {erroMessage}
-        </span>
+        <span className='text-red-600 text-sm mt-1 dark:text-red-500'>{erroMessage}</span>
       )}
     </label>
   );

@@ -48,9 +48,7 @@ export default function AuthLogin() {
   });
 
   // Actions
-  const handlerGetFieldErros = (
-    fieldName: keyof typeof formik.initialValues,
-  ) => {
+  const handlerGetFieldErros = (fieldName: keyof typeof formik.initialValues) => {
     return formik.touched[fieldName] && formik.errors[fieldName]
       ? formik.errors[fieldName]
       : undefined;
@@ -73,11 +71,7 @@ export default function AuthLogin() {
         {...formik.getFieldProps('password')}
       />
 
-      <Button
-        type='submit'
-        className='self-end mt-2.5'
-        disabled={formik.isSubmitting}
-      >
+      <Button type='submit' className='self-end mt-2.5' disabled={formik.isSubmitting}>
         Continuar
       </Button>
 

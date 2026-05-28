@@ -1,11 +1,20 @@
-import { useState, type SubmitEvent } from 'react';
 import { FaTrash } from 'react-icons/fa6';
-import toast from 'react-hot-toast';
-import type { taskI } from '../assets/types/task';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
 import { useTaskList } from '../assets/hooks/useTaskList';
 import TaskItemCheckbox from './taskItemCheckbox';
 import { ButtonIcon, Button } from './button';
 import InputField from './input';
+import type { taskI } from '../assets/types/task';
+
+// Schema
+const validationSchema = Yup.object({
+  taskTitle: Yup.string()
+    .max(20, 'Muito longo. Deve ter no máximo 20 caracteres')
+    .required('Campo obrigatório'),
+  taskDescription: Yup.string(),
+  taskIsCompleted: Yup.boolean().required('Campo obrigatório'),
+});
 
 type DrawerFormProps = {
   drawerIsOpen?: boolean;
@@ -14,41 +23,48 @@ type DrawerFormProps = {
 
 export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
   const { taskSelected, onTaskDelete, onTaskAdd, onTaskEdit } = useTaskList();
-  const [taskTitle, setTaskTitle] = useState(taskSelected.taskTitle);
-  const [taskDescription, setTaskDescription] = useState(taskSelected.taskDescription);
-  const [taskIsCompleted, setTaskIsCompleted] = useState(taskSelected.taskIsCompleted);
+  const {
+    values,
+    setFieldValue,
+    handleSubmit,
+    getFieldProps,
+    errors,
+    touched,
+    isSubmitting,
+  } = useFormik({
+    initialValues: {
+      taskTitle: taskSelected.taskTitle,
+      taskDescription: taskSelected.taskDescription,
+      taskIsCompleted: taskSelected.taskIsCompleted,
+    },
+    validationSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      const createTask: taskI = {
+        ...values,
+        id: taskSelected.id,
+        createdAt: taskSelected.createdAt,
+        updatedAt: taskSelected.updatedAt,
+      };
+
+      if (taskSelected.id !== '') {
+        onTaskEdit(createTask, onDrawerClose);
+        return;
+      }
+
+      onTaskAdd(createTask, onDrawerClose);
+    },
+  });
 
   // Actions
   const handleTaskDelete = () => onTaskDelete(taskSelected.id, onDrawerClose);
-  const onSubmit = (e: SubmitEvent) => {
-    e.preventDefault();
-
-    if (taskTitle === '') {
-      toast.error('Título da tarefa deve ser preenchido');
-      return;
-    }
-
-    const createTask: taskI = {
-      ...taskSelected,
-      taskTitle,
-      taskDescription,
-      taskIsCompleted,
-    };
-
-    if (taskSelected.id !== '') {
-      onTaskEdit(createTask, onDrawerClose);
-      return;
-    }
-
-    onTaskAdd(createTask, onDrawerClose);
-  };
 
   return (
     <>
       <div className='border-b border-b-gray-300 dark:border-b-gray-700 flex justify-between items-center pb-1.5'>
         <TaskItemCheckbox
-          checked={taskIsCompleted}
-          onToggle={() => setTaskIsCompleted((oldState) => !oldState)}
+          checked={values.taskIsCompleted}
+          onToggle={() => setFieldValue('taskIsCompleted', !values.taskIsCompleted)}
         />
 
         <ButtonIcon
@@ -60,21 +76,27 @@ export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
         </ButtonIcon>
       </div>
 
-      <form className='pt-4' onSubmit={onSubmit}>
+      <form className='pt-4' onSubmit={handleSubmit}>
         <InputField
           label='Título'
-          value={taskTitle}
-          onChange={(e) => setTaskTitle(e.target.value)}
+          erroMessage={
+            touched.taskTitle && errors.taskTitle ? errors.taskTitle : undefined
+          }
+          {...getFieldProps('taskTitle')}
         />
 
         <InputField
           label='Descrição'
           className='my-2'
-          value={taskDescription}
-          onChange={(e) => setTaskDescription(e.target.value)}
+          {...getFieldProps('taskDescription')}
         />
 
-        <Button type='submit' className='text-base mt-3.5 ml-auto'>
+        <Button
+          type='submit'
+          isLoading={isSubmitting}
+          disabled={isSubmitting}
+          className='text-base mt-3.5 ml-auto'
+        >
           {taskSelected.id === '' ? 'Adicionar' : 'Atualizar'}
         </Button>
       </form>
