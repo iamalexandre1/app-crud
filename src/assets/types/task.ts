@@ -3,10 +3,6 @@ export interface taskI {
   taskTitle: string;
   taskDescription: string;
   taskIsCompleted: boolean;
-}
-
-export interface taskFormI {
-  taskTitle: string;
-  taskDescription: string;
-  taskIsCompleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

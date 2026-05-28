@@ -1,8 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
-import type { taskI } from '../types/task';
-import { privateAPI } from '../service/api';
-import { TaskListContext, type TaskListContextProps } from './taskListContext';
+import type { taskI } from '../assets/types/task';
+import { privateAPI } from '../assets/service/api';
+import { TaskListContext, type TaskListContextProps } from '../assets/hooks/useTaskList';
 
 type TaskListProviderProps = {
   children: ReactNode;
@@ -15,6 +15,8 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
     taskTitle: '',
     taskDescription: '',
     taskIsCompleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   // Actions
@@ -58,15 +60,15 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
       })
       .catch((err) => toast.error(err.message));
   };
-  const onDefineTaskSelected = (dataTask: taskI) => {
-    setTaskSelected(dataTask);
-  };
+  const onDefineTaskSelected = (dataTask: taskI) => setTaskSelected(dataTask);
   const onResetTaskSelected = () =>
     setTaskSelected({
       id: '',
       taskTitle: '',
       taskDescription: '',
       taskIsCompleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
   useEffect(() => {

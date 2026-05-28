@@ -7,12 +7,16 @@ const taskList: taskI[] = [
     taskTitle: 'Item - 01',
     taskDescription: '',
     taskIsCompleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     id: '02',
     taskTitle: 'Item - 02',
     taskDescription: 'sla',
     taskIsCompleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
 ];
 
@@ -40,10 +44,14 @@ export const privateAPI = {
       ${(Math.random() * 100).toFixed(4)}-
       ${Date.now().toString()}-
       ${dataTask.taskTitle.toLowerCase().trim().replaceAll(' ', '')}
-    `;
+    `
+      .trim()
+      .replaceAll(' ', '');
     const createTask: taskI = {
       ...dataTask,
       id: createId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     taskList.push({ ...createTask });
@@ -65,6 +73,7 @@ export const privateAPI = {
     taskList[findTaskIndex].taskTitle = dataTask.taskTitle;
     taskList[findTaskIndex].taskDescription = dataTask.taskDescription;
     taskList[findTaskIndex].taskIsCompleted = dataTask.taskIsCompleted;
+    taskList[findTaskIndex].updatedAt = new Date();
 
     const resp: respAddTaskI = {
       msg: 'Tarefa atualizada com sucesso!',

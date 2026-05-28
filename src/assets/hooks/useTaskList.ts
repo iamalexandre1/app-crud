@@ -18,6 +18,8 @@ export const TaskListContext = createContext<TaskListContextProps>({
     taskTitle: '',
     taskDescription: '',
     taskIsCompleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   onTaskAdd: () => {},
   onTaskEdit: () => {},

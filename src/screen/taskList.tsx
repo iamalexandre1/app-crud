@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
 import { Toaster } from 'react-hot-toast';
-import type { taskI } from '../types/task';
-import { useTaskList } from '../context/taskListContext';
+import type { taskI } from '../assets/types/task';
+import { useTaskList } from '../assets/hooks/useTaskList';
 import { Button } from '../components/button';
 import TaskListItem from '../components/taskListItem';
 import Drawer from '../layout/drawer';

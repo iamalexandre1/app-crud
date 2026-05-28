@@ -1,11 +1,11 @@
 import { useState, type SubmitEvent } from 'react';
 import { FaTrash } from 'react-icons/fa6';
-import { useTaskList } from '../context/taskListContext';
+import toast from 'react-hot-toast';
+import type { taskI } from '../assets/types/task';
+import { useTaskList } from '../assets/hooks/useTaskList';
 import TaskItemCheckbox from './taskItemCheckbox';
 import { ButtonIcon, Button } from './button';
 import InputField from './input';
-import type { taskI } from '../types/task';
-import toast from 'react-hot-toast';
 
 type DrawerFormProps = {
   drawerIsOpen?: boolean;
@@ -29,7 +29,7 @@ export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
     }
 
     const createTask: taskI = {
-      id: taskSelected.id,
+      ...taskSelected,
       taskTitle,
       taskDescription,
       taskIsCompleted,
