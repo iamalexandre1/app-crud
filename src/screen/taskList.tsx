@@ -1,24 +1,18 @@
 import { useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
-import { Toaster } from 'react-hot-toast';
 import type { taskI } from '../assets/types/task';
-import { useTaskList } from '../assets/hooks/useTaskList';
+import { useTaskList } from '../context/taskListContext';
 import { Button } from '../components/button';
 import TaskListItem from '../components/taskListItem';
 import Drawer from '../layout/drawer';
 
 export default function TaskList() {
   const [drawer, setDrawer] = useState(false);
-  // Evita o bug: abrir drawer → digitar → fechar → abrir e manter valores antigos.
-  // Incrementamos esse contador ao abrir para remontar o form e re-aplicar valores iniciais.
-  const [enableReinitialize, setEnableReinitialize] = useState(0);
-  const { taskList, onDefineTaskSelected, onResetTaskSelected } = useTaskList();
+  const { taskList, isLoadingTaskList, onDefineTaskSelected, onResetTaskSelected } =
+    useTaskList();
 
   // Actions
-  const handleDrawerOpen = () => {
-    setDrawer(true);
-    setEnableReinitialize((prev) => prev + 1);
-  };
+  const handleDrawerOpen = () => setDrawer(true);
   const handleDrawerClose = () => {
     setDrawer(false);
     onResetTaskSelected();
@@ -30,7 +24,7 @@ export default function TaskList() {
 
   return (
     <>
-      <Drawer key={enableReinitialize} open={drawer} onClose={handleDrawerClose} />
+      <Drawer open={drawer} onClose={handleDrawerClose} />
 
       <div className='flex justify-between items-center'>
         <h2 className='text-2xl font-semibold mt-1.5'>Lista de Tarefas</h2>
@@ -42,12 +36,19 @@ export default function TaskList() {
       </div>
 
       <ul className='py-3'>
-        {taskList.map((task) => (
-          <TaskListItem key={task.id} data={task} onDrawerTaskEdit={onDrawerTaskEdit} />
-        ))}
-      </ul>
+        {isLoadingTaskList && (
+          <div className='border-4 border-t-transparent border-blue-400 rounded-full mx-auto w-8 h-8 animate-spin'></div>
+        )}
 
-      <Toaster position='bottom-center' />
+        {!isLoadingTaskList &&
+          taskList.map((task) => (
+            <TaskListItem key={task.id} data={task} onDrawerTaskEdit={onDrawerTaskEdit} />
+          ))}
+
+        {!isLoadingTaskList && taskList.length === 0 && (
+          <p className='text-lg font-medium text-center'> Nenhuma tarefa registrada </p>
+        )}
+      </ul>
     </>
   );
 }

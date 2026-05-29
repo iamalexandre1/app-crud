@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import InputField from '../components/input';
 import { Button } from '../components/button';
 
@@ -52,7 +52,7 @@ export default function AuthRegister() {
   });
 
   // Actions
-  const handlerGetFieldErros = (fieldName: keyof typeof formik.initialValues) => {
+  const handlerGetFieldErrors = (fieldName: keyof typeof formik.initialValues) => {
     return formik.touched[fieldName] && formik.errors[fieldName]
       ? formik.errors[fieldName]
       : undefined;
@@ -62,7 +62,7 @@ export default function AuthRegister() {
     <form className='flex flex-col pt-4 w-60' onSubmit={formik.handleSubmit}>
       <InputField
         label='Username'
-        erroMessage={handlerGetFieldErros('username')}
+        erroMessage={handlerGetFieldErrors('username')}
         {...formik.getFieldProps('username')}
       />
 
@@ -70,7 +70,7 @@ export default function AuthRegister() {
         type='email'
         label='Email'
         className='my-2'
-        erroMessage={handlerGetFieldErros('email')}
+        erroMessage={handlerGetFieldErrors('email')}
         {...formik.getFieldProps('email')}
       />
 
@@ -78,15 +78,13 @@ export default function AuthRegister() {
         type='password'
         label='Password'
         className='mb-2'
-        erroMessage={handlerGetFieldErros('password')}
+        erroMessage={handlerGetFieldErrors('password')}
         {...formik.getFieldProps('password')}
       />
 
-      <Button type='submit' className='self-end mt-2.5'>
+      <Button type='submit' className='self-end mt-2.5' disabled={formik.isSubmitting}>
         Continuar
       </Button>
-
-      <Toaster />
     </form>
   );
 }

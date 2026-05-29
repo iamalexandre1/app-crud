@@ -7,16 +7,16 @@ const taskList: taskI[] = [
     taskTitle: 'Item - 01',
     taskDescription: '',
     taskIsCompleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: '02',
     taskTitle: 'Item - 02',
     taskDescription: 'sla',
     taskIsCompleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ];
 
@@ -50,8 +50,8 @@ export const privateAPI = {
     const createTask: taskI = {
       ...dataTask,
       id: createId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     taskList.push({ ...createTask });
@@ -73,11 +73,11 @@ export const privateAPI = {
     taskList[findTaskIndex].taskTitle = dataTask.taskTitle;
     taskList[findTaskIndex].taskDescription = dataTask.taskDescription;
     taskList[findTaskIndex].taskIsCompleted = dataTask.taskIsCompleted;
-    taskList[findTaskIndex].updatedAt = new Date();
+    taskList[findTaskIndex].updatedAt = new Date().toISOString();
 
     const resp: respAddTaskI = {
       msg: 'Tarefa atualizada com sucesso!',
-      payload: taskList[findTaskIndex],
+      payload: { ...taskList[findTaskIndex] },
     };
 
     return new Promise((resolve) => setTimeout(() => resolve(resp), 800));

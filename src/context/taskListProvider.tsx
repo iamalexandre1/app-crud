@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import type { taskI } from '../assets/types/task';
 import { privateAPI } from '../assets/service/api';
-import { TaskListContext, type TaskListContextProps } from '../assets/hooks/useTaskList';
+import { TaskListContext, type TaskListContextProps } from './taskListContext';
 
 type TaskListProviderProps = {
   children: ReactNode;
@@ -15,23 +15,28 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
     taskTitle: '',
     taskDescription: '',
     taskIsCompleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   });
+  const [isLoadingTaskList, setIsLoadingTaskList] = useState(true);
 
   // Actions
-  const onTaskAdd = (dataTask: taskI, callback?: () => void) => {
-    privateAPI
+  const onTaskAdd = async (dataTask: taskI, callback?: () => void) => {
+    return await privateAPI
       .addTask(dataTask)
       .then((resp) => {
         setTaskList((task) => [resp.payload, ...task]);
         toast.success(resp.msg);
         callback?.();
       })
-      .catch((err) => toast.error(err.message));
+      .catch((err) => {
+        toast.error(err.message);
+        throw err;
+      });
   };
-  const onTaskEdit = (dataTask: taskI, callback?: () => void) => {
-    privateAPI
+
+  const onTaskEdit = async (dataTask: taskI, callback?: () => void) => {
+    return await privateAPI
       .editTask(dataTask)
       .then((resp) => {
         const updatedTask = taskList.map((task) => {
@@ -47,10 +52,14 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
 
         callback?.();
       })
-      .catch((err) => toast.error(err.message));
+      .catch((err) => {
+        toast.error(err.message);
+        throw err;
+      });
   };
-  const onTaskDelete = (taskId: string, callback?: () => void) => {
-    privateAPI
+
+  const onTaskDelete = async (taskId: string, callback?: () => void) => {
+    return await privateAPI
       .deleteTask(taskId)
       .then((resp) => {
         const updatedTask = taskList.filter((task) => task.id !== taskId);
@@ -58,8 +67,12 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
         toast.success(resp.msg);
         callback?.();
       })
-      .catch((err) => toast.error(err.message));
+      .catch((err) => {
+        toast.error(err.message);
+        throw err;
+      });
   };
+
   const onDefineTaskSelected = (dataTask: taskI) => setTaskSelected(dataTask);
   const onResetTaskSelected = () =>
     setTaskSelected({
@@ -67,27 +80,32 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
       taskTitle: '',
       taskDescription: '',
       taskIsCompleted: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
 
   useEffect(() => {
     const fetchTaskList = async () => {
-      try {
-        const respFecthTaskList = await privateAPI.getTaskList();
+      setIsLoadingTaskList(true);
 
-        setTaskList(respFecthTaskList);
+      try {
+        const respFetchTaskList = await privateAPI.getTaskList();
+
+        setTaskList(respFetchTaskList);
       } catch (err) {
-        console.log(err);
+        toast.error(err.message);
       }
+
+      setIsLoadingTaskList(false);
     };
 
     fetchTaskList();
   }, []);
 
-  const conextValues: TaskListContextProps = {
+  const contextValues: TaskListContextProps = {
     taskList,
     taskSelected,
+    isLoadingTaskList,
     onTaskAdd,
     onTaskEdit,
     onTaskDelete,
@@ -96,6 +114,6 @@ export default function TaskListProvider({ children }: TaskListProviderProps) {
   };
 
   return (
-    <TaskListContext.Provider value={conextValues}>{children}</TaskListContext.Provider>
+    <TaskListContext.Provider value={contextValues}>{children}</TaskListContext.Provider>
   );
 }

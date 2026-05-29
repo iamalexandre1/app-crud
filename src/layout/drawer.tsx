@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { FaX } from 'react-icons/fa6';
-import { useTaskList } from '../assets/hooks/useTaskList';
+import { useTaskList } from '../context/taskListContext';
 import DrawerForm from '../components/drawerForm';
 import { ButtonIcon } from '../components/button';
 
@@ -57,7 +57,7 @@ export default function Drawer({ open = false, onClose }: DrawerProps) {
         </div>
 
         <div className='pt-4 p-3'>
-          <DrawerForm onDrawerClose={onClose} />
+          <DrawerForm drawerIsOpen={open} onDrawerClose={onClose} />
         </div>
       </div>
     </div>

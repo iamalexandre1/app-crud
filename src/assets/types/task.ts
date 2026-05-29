@@ -3,6 +3,6 @@ export interface taskI {
   taskTitle: string;
   taskDescription: string;
   taskIsCompleted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }

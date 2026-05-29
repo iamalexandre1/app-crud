@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react';
 import { FaTrash } from 'react-icons/fa6';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import { useTaskList } from '../assets/hooks/useTaskList';
+import { useTaskList } from '../context/taskListContext';
 import TaskItemCheckbox from './taskItemCheckbox';
 import { ButtonIcon, Button } from './button';
 import InputField from './input';
@@ -21,16 +22,18 @@ type DrawerFormProps = {
   onDrawerClose: () => void;
 };
 
-export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
+export default function DrawerForm({ drawerIsOpen, onDrawerClose }: DrawerFormProps) {
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const { taskSelected, onTaskDelete, onTaskAdd, onTaskEdit } = useTaskList();
   const {
     values,
+    resetForm,
     setFieldValue,
     handleSubmit,
     getFieldProps,
     errors,
     touched,
-    isSubmitting,
   } = useFormik({
     initialValues: {
       taskTitle: taskSelected.taskTitle,
@@ -40,24 +43,37 @@ export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
     validationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
+      setIsLoadingSubmit(true);
+
       const createTask: taskI = {
         ...values,
         id: taskSelected.id,
         createdAt: taskSelected.createdAt,
         updatedAt: taskSelected.updatedAt,
       };
+      const onSuccess = () => onDrawerClose();
 
-      if (taskSelected.id !== '') {
-        onTaskEdit(createTask, onDrawerClose);
-        return;
-      }
+      const request =
+        taskSelected.id !== ''
+          ? onTaskEdit(createTask, onSuccess)
+          : onTaskAdd(createTask, onSuccess);
 
-      onTaskAdd(createTask, onDrawerClose);
+      request.finally(() => setIsLoadingSubmit(false));
     },
   });
 
   // Actions
-  const handleTaskDelete = () => onTaskDelete(taskSelected.id, onDrawerClose);
+  const handleTaskDelete = () => {
+    setIsLoadingDelete(true);
+
+    onTaskDelete(taskSelected.id, onDrawerClose).finally(() => setIsLoadingDelete(false));
+  };
+
+  useEffect(() => {
+    if (drawerIsOpen) return;
+
+    resetForm(); // Cuida do fluxo: adicionar → digitar → fechar → adicionar de novo.
+  }, [drawerIsOpen, resetForm]);
 
   return (
     <>
@@ -70,6 +86,7 @@ export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
         <ButtonIcon
           className='text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-500'
           disabled={taskSelected.id === ''}
+          isLoading={isLoadingDelete}
           onClick={handleTaskDelete}
         >
           <FaTrash className='text-lg' />
@@ -93,8 +110,8 @@ export default function DrawerForm({ onDrawerClose }: DrawerFormProps) {
 
         <Button
           type='submit'
-          isLoading={isSubmitting}
-          disabled={isSubmitting}
+          isLoading={isLoadingSubmit}
+          disabled={isLoadingSubmit}
           className='text-base mt-3.5 ml-auto'
         >
           {taskSelected.id === '' ? 'Adicionar' : 'Atualizar'}

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
 import InputField from '../components/input';
 import { Button } from '../components/button';
@@ -48,7 +48,7 @@ export default function AuthLogin() {
   });
 
   // Actions
-  const handlerGetFieldErros = (fieldName: keyof typeof formik.initialValues) => {
+  const handlerGetFieldErrors = (fieldName: keyof typeof formik.initialValues) => {
     return formik.touched[fieldName] && formik.errors[fieldName]
       ? formik.errors[fieldName]
       : undefined;
@@ -59,7 +59,7 @@ export default function AuthLogin() {
       <InputField
         type='email'
         label='Email'
-        erroMessage={handlerGetFieldErros('email')}
+        erroMessage={handlerGetFieldErrors('email')}
         {...formik.getFieldProps('email')}
       />
 
@@ -67,15 +67,13 @@ export default function AuthLogin() {
         type='password'
         label='Password'
         className='my-2'
-        erroMessage={handlerGetFieldErros('password')}
+        erroMessage={handlerGetFieldErrors('password')}
         {...formik.getFieldProps('password')}
       />
 
       <Button type='submit' className='self-end mt-2.5' disabled={formik.isSubmitting}>
         Continuar
       </Button>
-
-      <Toaster position='top-center' />
     </form>
   );
 }

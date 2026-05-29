@@ -32,7 +32,7 @@ export function Button({ className, isLoading, children, ...rest }: ButtonProps)
   );
 }
 
-export function ButtonIcon({ className, children, ...rest }: ButtonProps) {
+export function ButtonIcon({ className, isLoading, children, ...rest }: ButtonProps) {
   return (
     <button
       className={twMerge(
@@ -42,7 +42,11 @@ export function ButtonIcon({ className, children, ...rest }: ButtonProps) {
       )}
       {...rest}
     >
-      {children}
+      {!isLoading && children}
+
+      {isLoading && (
+        <div className='border-2 border-t-transparent border-blue-400 rounded-full w-5 h-5 animate-spin'></div>
+      )}
     </button>
   );
 }
